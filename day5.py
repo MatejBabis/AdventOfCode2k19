@@ -11,71 +11,78 @@ def parse_instruction(val):
     return op, params
 
 
-# Read in the program
-with open("inputs/day5.txt", "r") as f:
-    # parse input into a list of ints
-    prog = list(map(int, f.readlines()[0][:-1].split(',')))
+def parse_program(prog, inp, i=0):
+    prog_output = None
 
-prog_input = 5
-prog_output = None
-
-i = 0
-while True:
-    # get the OP and its parameters
-    op, params = parse_instruction(prog[i])
-    # termination
-    if op == 99:
-        break
-    # adition
-    elif op == 1:
-        # if/else oneliner figures out if position or immediate mode
-        val1 = prog[i+1] if params[0] == 1 else prog[prog[i+1]]
-        val2 = prog[i+2] if params[1] == 1 else prog[prog[i+2]]
-        # writing always in position mode (here and thereafter)
-        prog[prog[i+3]] = val1 + val2
-        i += 4
-    # multiplication
-    elif op == 2:
-        val1 = prog[i+1] if params[0] == 1 else prog[prog[i+1]]
-        val2 = prog[i+2] if params[1] == 1 else prog[prog[i+2]]
-        prog[prog[i+3]] = val1 * val2
-        i += 4
-    # input
-    elif op == 3:
-        prog[prog[i+1]] = prog_input
-        i += 2
-    # output
-    elif op == 4:
-        prog_output = prog[i+1] if params[0] == 1 else prog[prog[i+1]]
-        i += 2
-    # jump-if-true
-    elif op == 5:
-        val1 = prog[i+1] if params[0] == 1 else prog[prog[i+1]]
-        if val1 != 0:
-            i = prog[i+2] if params[1] == 1 else prog[prog[i+2]]
+    while True:
+        # get the OP and its parameters
+        op, params = parse_instruction(prog[i])
+        # termination
+        if op == 99:
+            # support for changes inputs in day7
+            return prog, None, i
+        # adition
+        elif op == 1:
+            # if/else oneliner figures out if position or immediate mode
+            val1 = prog[i+1] if params[0] == 1 else prog[prog[i+1]]
+            val2 = prog[i+2] if params[1] == 1 else prog[prog[i+2]]
+            # writing always in position mode (here and thereafter)
+            prog[prog[i+3]] = val1 + val2
+            i += 4
+        # multiplication
+        elif op == 2:
+            val1 = prog[i+1] if params[0] == 1 else prog[prog[i+1]]
+            val2 = prog[i+2] if params[1] == 1 else prog[prog[i+2]]
+            prog[prog[i+3]] = val1 * val2
+            i += 4
+        # input
+        elif op == 3:
+            # support for mulitple inputs in day7
+            prog[prog[i+1]] = inp.pop(0)
+            i += 2
+        # output
+        elif op == 4:
+            prog_output = prog[i+1] if params[0] == 1 else prog[prog[i+1]]
+            i += 2
+            # support for changes inputs in day7
+            return prog[:], prog_output, i
+        # jump-if-true
+        elif op == 5:
+            val1 = prog[i+1] if params[0] == 1 else prog[prog[i+1]]
+            if val1 != 0:
+                i = prog[i+2] if params[1] == 1 else prog[prog[i+2]]
+            else:
+                i += 3
+        # jump-if-false
+        elif op == 6:
+            val1 = prog[i+1] if params[0] == 1 else prog[prog[i+1]]
+            if val1 == 0:
+                i = prog[i+2] if params[1] == 1 else prog[prog[i+2]]
+            else:
+                i += 3
+        # less-than
+        elif op == 7:
+            val1 = prog[i+1] if params[0] == 1 else prog[prog[i+1]]
+            val2 = prog[i+2] if params[1] == 1 else prog[prog[i+2]]
+            prog[prog[i+3]] = 1 if val1 < val2 else 0
+            i += 4
+        # equals
+        elif op == 8:
+            val1 = prog[i+1] if params[0] == 1 else prog[prog[i+1]]
+            val2 = prog[i+2] if params[1] == 1 else prog[prog[i+2]]
+            prog[prog[i+3]] = 1 if val1 == val2 else 0
+            i += 4
+        # invalid input
         else:
-            i += 3
-    # jump-if-false
-    elif op == 6:
-        val1 = prog[i+1] if params[0] == 1 else prog[prog[i+1]]
-        if val1 == 0:
-            i = prog[i+2] if params[1] == 1 else prog[prog[i+2]]
-        else:
-            i += 3
-    # less-than
-    elif op == 7:
-        val1 = prog[i+1] if params[0] == 1 else prog[prog[i+1]]
-        val2 = prog[i+2] if params[1] == 1 else prog[prog[i+2]]
-        prog[prog[i+3]] = 1 if val1 < val2 else 0
-        i += 4
-    # equals
-    elif op == 8:
-        val1 = prog[i+1] if params[0] == 1 else prog[prog[i+1]]
-        val2 = prog[i+2] if params[1] == 1 else prog[prog[i+2]]
-        prog[prog[i+3]] = 1 if val1 == val2 else 0
-        i += 4
-    # invalid input
-    else:
-        raise Exception('Illegal OPCODE. The value was: {}'.format(op))
+            raise Exception('Illegal OPCODE. The value was: {}'.format(op))
 
-print("Part 1 and/or 2 Answer:", prog_output)
+if __name__ == '__main__':
+    # Read in the program
+    with open("inputs/day5.txt", "r") as f:
+        # parse input into a list of ints
+        program = list(map(int, f.readlines()[0][:-1].split(',')))
+
+    program_input = [5]
+    _, result, _ = parse_program(program, program_input)
+    
+    print("Part 1 and/or 2 Answer:", result)
