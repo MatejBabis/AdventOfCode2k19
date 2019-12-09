@@ -1,10 +1,9 @@
+from intcode import parse_intcode_program
 from day5 import parse_program
 from itertools import permutations
 
 # Read in the program
-with open("inputs/day7.txt", "r") as f:
-    # parse input into a list of ints
-    program = list(map(int, f.readlines()[0][:-1].split(',')))
+program  = parse_intcode_program("inputs/day7.txt")
 
 max_signal = (float('-inf'), None)
 for permutation in permutations(range(5)):

@@ -1,3 +1,5 @@
+from intcode import parse_intcode_program
+
 def parse_instruction(val):
     str_val = str(val)
     params = [0, 0, 0]  # using 3 parameters
@@ -11,7 +13,18 @@ def parse_instruction(val):
     return op, params
 
 
-def parse_program(prog, inp, i=0):
+def parse_mode(program, parameters, param_index, pos):
+    if parameters[param_index] == 0:      # position mode
+        return program[program[pos+1]]
+    elif parameters[param_index] == 1:    # immediate mode
+        return program[program+1]
+    elif parameters[param_index] == 2:    # relative mode
+        pass
+    else:
+        raise Exception('Illegal mode!. The value was: {}'.format(op))
+
+
+def parse_program(prog, inp=[], i=0):
     prog_output = None
 
     while True:
@@ -23,7 +36,6 @@ def parse_program(prog, inp, i=0):
             return prog, None, i
         # adition
         elif op == 1:
-            # if/else oneliner figures out if position or immediate mode
             val1 = prog[i+1] if params[0] == 1 else prog[prog[i+1]]
             val2 = prog[i+2] if params[1] == 1 else prog[prog[i+2]]
             # writing always in position mode (here and thereafter)
@@ -77,12 +89,9 @@ def parse_program(prog, inp, i=0):
             raise Exception('Illegal OPCODE. The value was: {}'.format(op))
 
 if __name__ == '__main__':
-    # Read in the program
-    with open("inputs/day5.txt", "r") as f:
-        # parse input into a list of ints
-        program = list(map(int, f.readlines()[0][:-1].split(',')))
+    program  = parse_intcode_program("inputs/day5.txt")
 
     program_input = [5]
     _, result, _ = parse_program(program, program_input)
-    
+
     print("Part 1 and/or 2 Answer:", result)
