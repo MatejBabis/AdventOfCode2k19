@@ -13,17 +13,6 @@ def parse_instruction(val):
     return op, params
 
 
-def parse_mode(program, parameters, param_index, pos):
-    if parameters[param_index] == 0:      # position mode
-        return program[program[pos+1]]
-    elif parameters[param_index] == 1:    # immediate mode
-        return program[program+1]
-    elif parameters[param_index] == 2:    # relative mode
-        pass
-    else:
-        raise Exception('Illegal mode!. The value was: {}'.format(op))
-
-
 def parse_program(prog, inp=[], i=0):
     prog_output = None
 
